@@ -1,14 +1,46 @@
 var express = require('express');
-
+var https = require('https')
+var fs = require('fs');
 var router = express.Router();
+
+var authIs = false;     //初始化鉴权结果为:false
 
 var userDAO = require('../dao/userDAO');
 //var result = require('../model/result');
 
 //服务器控制台反馈：Api to use for all requests
 router.use(function (req, res, next) {
-    // do logging
-    console.log('Something is happening.');
+    //鉴权
+    //var authIs = false;
+    fs.readFile('./Apikey/Apikey.json', function (err, data) {
+        if (err) {
+            console.error(err);
+        };
+        var Apikey = JSON.parse(data.toString());  //Buffer转换成字符串再转换成json
+        var auth = req.headers.authorization;
+        //console.log(Apikey.length);
+        //var authIs = false;
+        for (var i = 0; i < Apikey.length; i++) {
+            if (Apikey[i].Apikey == auth) {
+                authIs = true;
+            };
+        };
+    });
+    //console.log('Something is happening.');
+    var get_client_ip = function (req) {
+        var ip = req.headers['x-forwarded-for'] ||
+            req.ip ||
+            req.connection.remoteAddress ||
+            req.socket.remoteAddress ||
+            req.connection.socket.remoteAddress || '';
+        if (ip.split(',').length > 0) {
+            ip = ip.split(',')[0]
+        }
+        return ip;
+    };
+    console.log(get_client_ip(req));
+    let ip = get_client_ip(req).match(/\d+.\d+.\d+.\d+/);
+    console.log(ip);
     next(); // make sure we go to the next routes and don't stop here
 });
 
@@ -19,6 +51,13 @@ router.get('/', function (req, res, next) {
 
 // 接口方法 GET users?
 router.get('/users?', function (req, res, next) {
+    if (authIs == false) {
+        console.log('Auth false.');
+        var result = {};
+        result.GET = 'Auth false';
+        res.json(result);
+        return next();
+    };
     if (req.query.page == undefined | req.query.pageSize == undefined) {
         var result = {};
         result.GET = 'page|pageSize is undefined.';
@@ -46,6 +85,13 @@ router.get('/users?', function (req, res, next) {
 
 // 接口方法 GET users/id
 router.get('/users/:id', function (req, res) {
+    if (authIs == false) {
+        console.log('Auth false.');
+        var result = {};
+        result.GET = 'Auth false';
+        res.json(result);
+        return next();
+    };
     var id = req.params.id;
     console.log('GET users/id called, id: ' + id);
     userDAO.getById(id, function (user) {
@@ -72,6 +118,13 @@ router.delete('/users/:id', function (req, res) {
 
 // 接口方法 POST users     return next()前提是第73行（本行后有next参数）
 router.post('/users', function (req, res, next) {
+    if (authIs == false) {
+        console.log('Auth false.');
+        var result = {};
+        result.POST = 'Auth false';
+        res.json(result);
+        return next();
+    };
     console.log('addUser called');
     var user = req.body;
     if (user == undefined | user.username == undefined | user.password == undefined) {
@@ -90,6 +143,13 @@ router.post('/users', function (req, res, next) {
 
 // 接口方法 PUT users 
 router.put('/users/:id', function (req, res) {
+    if (authIs == false) {
+        console.log('Auth false.');
+        var result = {};
+        result.PUT = 'Auth false';
+        res.json(result);
+        return next();
+    };
     console.log('updateUser called');
     var user = req.body;
     user.id = req.params.id;
@@ -103,12 +163,19 @@ router.put('/users/:id', function (req, res) {
 
 // 接口方法 PATCH users
 router.patch('/users/:id', function (req, res, next) {
+    if (authIs == false) {
+        console.log('Auth false.');
+        var result = {};
+        result.PATCH = 'Auth false';
+        res.json(result);
+        return next();
+    };
     console.log('patchUser called');
     userDAO.getById(req.params.id, function (user) {
         if (user == undefined) {
             var id = req.params.id;
             var result = {};
-            result.PATCH = 'No record with this ID '+ id;
+            result.PATCH = 'No record with this ID ' + id;
             res.json(result);
             return next();
         };

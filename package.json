@@ -1,5 +1,5 @@
 {
-  "name": "nodeapi",
+  "name": "nodeapi_metals",
   "version": "1.0.0",
   "description": "",
   "main": "server.js",
@@ -7,8 +7,16 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "node server.js"
   },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/BitDak/nodeApi_metals.git"
+  },
   "author": "",
   "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/BitDak/nodeApi_metals/issues"
+  },
+  "homepage": "https://github.com/BitDak/nodeApi_metals#readme",
   "dependencies": {
     "body-parser": "^1.19.0",
     "express": "^4.17.1",
