@@ -1,9 +1,9 @@
 module.exports = {
     mysql: {
-        host: 'cdb-hf5nuibm.cd.tencentcdb.com',
-        port:'10002',
+        host: 'yourmysql',
+        port:'3306',
         user: 'root',
-        password: 'lyyc1413',
+        password: 'password',
         database:'express-mysql-demo',
         // 最大连接数，默认为10
         connectionLimit: 10
