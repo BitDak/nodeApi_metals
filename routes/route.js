@@ -5,7 +5,7 @@ var router = express.Router();
 
 var authIs = false;     //初始化鉴权结果为:false
 
-var userDAO = require('../dao/userDAO');
+var userDAO = require('../dao/userDao');
 //var result = require('../model/result');
 
 //服务器控制台反馈：Api to use for all requests
@@ -29,7 +29,7 @@ router.use(function (req, res, next) {
     //console.log('Something is happening.');
     var get_client_ip = function (req) {
         var ip = req.headers['x-forwarded-for'] ||
-            req.ip ||
+            req.ip || 
             req.connection.remoteAddress ||
             req.socket.remoteAddress ||
             req.connection.socket.remoteAddress || '';
@@ -38,7 +38,7 @@ router.use(function (req, res, next) {
         }
         return ip;
     };
-    console.log(get_client_ip(req));
+    //console.log(get_client_ip(req));
     let ip = get_client_ip(req).match(/\d+.\d+.\d+.\d+/);
     console.log(ip);
     next(); // make sure we go to the next routes and don't stop here
@@ -84,7 +84,7 @@ router.get('/users?', function (req, res, next) {
 });
 
 // 接口方法 GET users/id
-router.get('/users/:id', function (req, res) {
+router.get('/users/:id', function (req, res,next) {
     if (authIs == false) {
         console.log('Auth false.');
         var result = {};
@@ -106,7 +106,14 @@ router.get('/users/:id', function (req, res) {
 });
 
 // 接口方法 DELETE users/id
-router.delete('/users/:id', function (req, res) {
+router.delete('/users/:id', function (req, res,next) {
+    if (authIs == false) {
+        console.log('Auth false.');
+        var result = {};
+        result.POST = 'Auth false';
+        res.json(result);
+        return next();
+    };
     var id = req.params.id;
     console.log('DELETE users/id called, id=' + id);
     userDAO.deleteById(id, function (success) {
@@ -142,7 +149,7 @@ router.post('/users', function (req, res, next) {
 });
 
 // 接口方法 PUT users 
-router.put('/users/:id', function (req, res) {
+router.put('/users/:id', function (req, res,next) {
     if (authIs == false) {
         console.log('Auth false.');
         var result = {};
