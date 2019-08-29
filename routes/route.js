@@ -18,7 +18,7 @@ router.use(function (req, res, next) {
         };
         var Apikey = JSON.parse(data.toString());  //Buffer转换成字符串再转换成json
         var auth = req.headers.authorization;
-        //console.log(Apikey.length);
+        console.log(auth);
         //var authIs = false;
         for (var i = 0; i < Apikey.length; i++) {
             if (Apikey[i].Apikey == auth) {
