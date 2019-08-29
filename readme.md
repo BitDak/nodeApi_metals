@@ -58,5 +58,6 @@ BitdakAPIAuthorization201908协议：appName:permission
 ##### 3.2 多业务（client）支持及Apikey在服务端的可视化监控
 
 ​配置一个json数组文件，将授权的Apikey都存进数组，由服务器进行核对。
-
+### 4、说明
+由于涉及数据库连接私密信息。git版本中已将`/conf/mysqlConf.js`隐去。朋友们可自行补充或联系代码上传者。
 (完成)
