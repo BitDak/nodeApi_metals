@@ -3,33 +3,35 @@ var https = require('https')
 var fs = require('fs');
 var router = express.Router();
 
+var userDAO = require('../dao/userDao');
+
 var authIs = false;     //初始化鉴权结果为:false
 
-var userDAO = require('../dao/userDao');
-//var result = require('../model/result');
+// 初始化已注册在Apikey.json中的Apikey
+var Apikey={}; 
+fs.readFile('./Apikey/Apikey.json', function (err, data, callback) {
+    if (err) {
+        console.error(err);
+    };
+    callback = data;
+    Apikey = JSON.parse(data.toString());  //Buffer转换成字符串再转换成json
+    callback = Apikey;
+});
 
 //服务器控制台反馈：Api to use for all requests
 router.use(function (req, res, next) {
-    //鉴权
-    //var authIs = false;
-    fs.readFile('./Apikey/Apikey.json', function (err, data) {
-        if (err) {
-            console.error(err);
+    //鉴权。鉴权结果authIs=trun时将用于实现GET PUT POST DELETE PACTH
+    var auth = req.headers.authorization;
+    //console.log(auth);   //根据运行需要决定，服务器是否打开此监控
+    for (var i = 0; i < Apikey.length; i++) {
+        if (Apikey[i].Apikey == auth) {
+            authIs = true;
         };
-        var Apikey = JSON.parse(data.toString());  //Buffer转换成字符串再转换成json
-        var auth = req.headers.authorization;
-        console.log(auth);
-        //var authIs = false;
-        for (var i = 0; i < Apikey.length; i++) {
-            if (Apikey[i].Apikey == auth) {
-                authIs = true;
-            };
-        };
-    });
-    //console.log('Something is happening.');
+    };
+    //监控客户端ip地址
     var get_client_ip = function (req) {
         var ip = req.headers['x-forwarded-for'] ||
-            req.ip || 
+            req.ip ||
             req.connection.remoteAddress ||
             req.socket.remoteAddress ||
             req.connection.socket.remoteAddress || '';
@@ -38,7 +40,6 @@ router.use(function (req, res, next) {
         }
         return ip;
     };
-    //console.log(get_client_ip(req));
     let ip = get_client_ip(req).match(/\d+.\d+.\d+.\d+/);
     console.log(ip);
     next(); // make sure we go to the next routes and don't stop here
@@ -84,7 +85,7 @@ router.get('/users?', function (req, res, next) {
 });
 
 // 接口方法 GET users/id
-router.get('/users/:id', function (req, res,next) {
+router.get('/users/:id', function (req, res, next) {
     if (authIs == false) {
         console.log('Auth false.');
         var result = {};
@@ -106,7 +107,7 @@ router.get('/users/:id', function (req, res,next) {
 });
 
 // 接口方法 DELETE users/id
-router.delete('/users/:id', function (req, res,next) {
+router.delete('/users/:id', function (req, res, next) {
     if (authIs == false) {
         console.log('Auth false.');
         var result = {};
@@ -149,7 +150,7 @@ router.post('/users', function (req, res, next) {
 });
 
 // 接口方法 PUT users 
-router.put('/users/:id', function (req, res,next) {
+router.put('/users/:id', function (req, res, next) {
     if (authIs == false) {
         console.log('Auth false.');
         var result = {};
