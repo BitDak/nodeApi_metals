@@ -8,7 +8,7 @@ var userDAO = require('../dao/userDao');
 var authIs = false;     //初始化鉴权结果为:false
 
 // 初始化已注册在Apikey.json中的Apikey
-var Apikey={}; 
+var Apikey = {};
 fs.readFile('./Apikey/Apikey.json', function (err, data, callback) {
     if (err) {
         console.error(err);
@@ -20,6 +20,7 @@ fs.readFile('./Apikey/Apikey.json', function (err, data, callback) {
 
 //服务器控制台反馈：Api to use for all requests
 router.use(function (req, res, next) {
+    authIs = false;
     //鉴权。鉴权结果authIs=trun时将用于实现GET PUT POST DELETE PACTH
     var auth = req.headers.authorization;
     //console.log(auth);   //根据运行需要决定，服务器是否打开此监控
